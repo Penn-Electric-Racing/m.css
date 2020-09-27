@@ -38,6 +38,7 @@ import glob
 import mimetypes
 import shutil
 import subprocess
+import tarfile
 import urllib.parse
 import logging
 from types import SimpleNamespace as Empty
@@ -3851,3 +3852,13 @@ if __name__ == '__main__': # pragma: no cover
         subprocess.run(["doxygen", doxyfile], cwd=os.path.dirname(doxyfile), check=True)
 
     run(state, templates=os.path.abspath(args.templates), wildcard=args.wildcard, index_pages=args.index_pages, search_merge_subtrees=not args.search_no_subtree_merging, search_add_lookahead_barriers=not args.search_no_lookahead_barriers, search_merge_prefixes=not args.search_no_prefix_merging)
+
+    tarball = os.environ["TARBALL"]
+
+    try:
+        os.remove(tarball)
+    except FileNotFoundError:
+        pass
+
+    with tarfile.open(tarball, "x:gz") as tar:
+        tar.add(os.path.join(os.path.dirname(doxyfile), state.doxyfile['OUTPUT_DIRECTORY']), arcname="docs")
