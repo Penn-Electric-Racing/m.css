@@ -1963,6 +1963,12 @@ def parse_func(state: State, element: ET.Element):
     # Extract additional C++11 stuff from the signature. Order matters, going
     # from the keywords that can be rightmost to the leftmost.
     signature: str = element.find('argsstring').text
+
+    # Not sure why this is necessary, but there is a 'ref' function that
+    # doesn't have a signature that we need to skip
+    if signature is None:
+        return None
+
     if signature.endswith('=default'):
         signature = signature[:-8]
         func.is_defaulted = True
